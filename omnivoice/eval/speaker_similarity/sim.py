@@ -207,7 +207,8 @@ def main():
     samples = read_test_list(args.test_list)
 
     # Setup Parallel Processing
-    num_gpus = torch.cuda.device_count()
+    # num_gpus = torch.cuda.device_count()
+    num_gpus = torch.xpu.device_count()
     assert num_gpus > 0, "No GPU found. GPU is required."
     total_procs = num_gpus * args.nj_per_gpu
 

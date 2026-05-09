@@ -57,6 +57,8 @@ def get_best_device():
     """Auto-detect the best available device: CUDA > MPS > CPU."""
     if torch.cuda.is_available():
         return "cuda", torch.cuda.device_count()
+    if torch.xpu.is_available():
+        return "xpu", 1
     if torch.backends.mps.is_available():
         return "mps", 1
     return "cpu", 1
@@ -227,6 +229,8 @@ def process_init(rank_queue, model_checkpoint, warmup=0):
         worker_device = "cpu"
     elif device_type == "mps":
         worker_device = "mps"
+    elif device_type == "xpu":
+        worker_device = "xpu"
     else:
         worker_device = f"cuda:{device_id}"
 

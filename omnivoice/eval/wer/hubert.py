@@ -102,9 +102,12 @@ def process_init(rank_queue, model_dir):
     except Exception:
         raise RuntimeError("Failed to get GPU rank from queue.")
 
-    assert torch.cuda.is_available(), "CUDA is required but not available."
-    worker_device = torch.device(f"cuda:{rank}")
-    torch.cuda.set_device(rank)
+    # assert torch.cuda.is_available(), "CUDA is required but not available."
+    # worker_device = torch.device(f"cuda:{rank}")
+    # torch.cuda.set_device(rank)
+    assert torch.xpu.is_available(), "XPU is required but not available."
+    worker_device = torch.device(f"xpu:{rank}")
+    torch.xpu.set_device(rank)
 
     logging.info(f"Initializing worker on device: {worker_device}")
 
@@ -223,7 +226,8 @@ def main():
         )
     total_files = len(data_list)
 
-    num_gpus = torch.cuda.device_count()
+    # num_gpus = torch.cuda.device_count()
+    num_gpus = torch.xpu.device_count()
     assert num_gpus > 0, "No GPU found. GPU is required."
     total_workers = num_gpus * args.nj_per_gpu
 

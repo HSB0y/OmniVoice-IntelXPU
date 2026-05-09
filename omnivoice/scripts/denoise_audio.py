@@ -568,6 +568,9 @@ def subprocess_worker_main():
     if torch.cuda.is_available():
         torch.cuda.set_device(0)
         device = "cuda:0"
+    if torch.xpu.is_available():
+        torch.xpu.set_device(0)
+        device = "xpu:0"
     else:
         logging.warning("CUDA not available in worker subprocess.")
 
@@ -838,7 +841,8 @@ def main() -> None:
     )
 
     # ── Multi-GPU process pool ──
-    num_devices = torch.cuda.device_count()
+    # num_devices = torch.cuda.device_count()
+    num_devices = torch.xpu.device_count()
     if num_devices == 0:
         logging.warning("No GPUs detected - using CPU for processing")
         num_processes = args.nj_per_gpu

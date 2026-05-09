@@ -39,6 +39,8 @@ def get_best_device():
     """Auto-detect the best available device: CUDA > MPS > CPU."""
     if torch.cuda.is_available():
         return "cuda"
+    if torch.xpu.is_available():
+        return "xpu"
     if torch.backends.mps.is_available():
         return "mps"
     return "cpu"

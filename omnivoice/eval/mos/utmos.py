@@ -113,7 +113,8 @@ def worker_init(
 
     rank = rank_queue.get() if rank_queue else -1
 
-    worker_device = get_device(rank)
+    # worker_device = get_device(rank)
+    worker_device = torch.device("xpu:0")
     worker_sr = 16000
 
     logging.debug(f"Initializing UTMOS worker on {worker_device}")
@@ -192,7 +193,8 @@ def main():
         raise ValueError(f"Error reading test list {args.test_list}: {e}")
 
     # Setup Parallel Processing
-    num_gpus = torch.cuda.device_count()
+    # num_gpus = torch.cuda.device_count()
+    num_gpus = torch.xpu.device_count()
     assert num_gpus > 0, "No GPU found. GPU is required."
     total_procs = num_gpus * args.nj_per_gpu
 

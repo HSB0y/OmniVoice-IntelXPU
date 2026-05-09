@@ -203,6 +203,8 @@ def process_init(rank_queue, tokenizer_path):
     # Determine device
     if rank != -1 and torch.cuda.is_available():
         worker_device = torch.device(f"cuda:{rank}")
+    elif rank != -1 and torch.xpu.is_available():
+        worker_device = torch.device(f"xpu:{rank}")
     else:
         worker_device = torch.device("cpu")
 
@@ -418,7 +420,8 @@ def main() -> None:
     )
 
     # Configure multi-GPU multi-process setup
-    num_devices = torch.cuda.device_count()
+    # num_devices = torch.cuda.device_count()
+    num_devices = torch.xpu.device_count()
     if num_devices == 0:
         logging.warning("No GPUs detected - using CPU for processing")
         num_processes = args.nj_per_gpu

@@ -81,6 +81,17 @@ from omnivoice.utils.voice_design import (
 
 logger = logging.getLogger(__name__)
 
+if hasattr(torch, "xpu"):
+    def _patched_mem_get_info(device: int = 0):
+        allocated = torch.xpu.memory_allocated(device)
+        reserved = torch.xpu.memory_reserved(device)
+        # Intel Arc B580: total 12GB
+        total = int(12 * 1024**3)
+        free = max(total - allocated - reserved, 0)
+        return free, total
+
+    torch.xpu.mem_get_info = _patched_mem_get_info
+
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -305,7 +316,8 @@ class OmniVoice(PreTrainedModel):
 
         logger.info("Loading ASR model %s ...", model_name)
         asr_dtype = (
-            torch.float16 if str(self.device).startswith("cuda") else torch.float32
+            # torch.float16 if str(self.device).startswith("cuda") else torch.float32
+            torch.float16
         )
 
         model_name = _resolve_model_path(model_name)
